@@ -1,29 +1,70 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter, Depends
 from api.v1.users.utility import *
-from api.v1.users.schema import User
-from fastapi.encoders import jsonable_encoder
+from api.v1.users.schema import NewUser, UpdateUserModel
 from sqlalchemy.orm import Session
 from database.connection import get_db
+from fastapi.security import OAuth2PasswordRequestForm
 
-router = APIRouter()
+public_router = APIRouter()
+private_router = APIRouter()
 
-@router.post("/sign-in")
-async def endpoint_sign_in(
-    data: User,
-    db: Session = Depends(get_db)
-):  
-    json_data = jsonable_encoder(data)
-    response = await sign_in(json_data,db)
-    return response
 
-@router.post("/login")
-async def endpoint_login():
-    pass
+@public_router.post("/sign-up")
+async def endpoint_sign_up(
+        data: NewUser,
+        db: Session = Depends(get_db)
+):
+    try:
+        response = await sign_up(data, db)
+        return response
+    except Exception as e:
+        return e
 
-@router.get("/get-detail")
-async def endpoint_get_user_detail():
-    pass
 
-@router.get("/get-list")
+@public_router.post("/sign-in")
+async def endpoint_login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)
+
+):
+    try:
+        response = await log_in(form_data, db)
+        return response
+    except Exception as e:
+        return e
+
+
+@private_router.get("/get-detail/{user_id}")
+async def endpoint_get_user_detail(
+        user_id: int,
+        db: Session = Depends(get_db)
+):
+    try:
+        response = await user_detail(user_id, db)
+        return response
+    except Exception as e:
+        return e
+
+
+@private_router.get("/get-list")
 async def endpoint_get_users_list():
     pass
+
+
+@private_router.post("/delete")
+async def endpoint_delete_user():
+    pass
+
+
+@private_router.post("/update-detail/{user_id}")
+async def endpoint_update_user_detail(
+        user_id: int,
+        data: UpdateUserModel,
+        db: Session = Depends(get_db)
+):
+    try:
+        response = await update_user(user_id, data, db)
+        return response
+    except Exception as e:
+        print(e)
+        return e
