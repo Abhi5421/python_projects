@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from utils.encryption_utility import *
 from typing import Union
-from fastapi import status, Depends
+from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 from database.config import jwt_settings
 from database.connection import SessionLocal
 from jose import jwt, JWTError
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def sign_up(data: NewUser, db: Session):
@@ -24,7 +25,7 @@ async def sign_up(data: NewUser, db: Session):
     return {"message": "User created successfully!"}
 
 
-async def get_authorised_user(token: str = Depends(oauth2_scheme)):
+async def get_authorised_user(token: str):
     try:
         token = token["authorization"].split(" ")[1]
         payload = jwt.decode(token, jwt_settings.jwt_secret_key, algorithms=[jwt_settings.jwt_algorithm])
@@ -39,7 +40,7 @@ async def get_authorised_user(token: str = Depends(oauth2_scheme)):
         return False
     user = user.user_json()
     scopes = user.get("name")
-    return scopes,user
+    return scopes, user
 
 
 def check_if_user_exists(data: Union[str, int], db: Session):
@@ -93,5 +94,12 @@ async def user_detail(user_id: int, db: Session):
         status_code=400, detail="User doesn't exist")
 
 
-async def users_list():
-    pass
+async def users_list(db: Session):
+    response = db.query(User).all()
+    return response
+
+
+async def delete_user(user_id: int, db: Session):
+    response = db.query(User).delete(User.user_id == user_id)
+    if response:
+        return {"message":"User deleted"}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter,Depends
 from api.v1.users.utility import *
 from api.v1.users.schema import NewUser, UpdateUserModel
 from sqlalchemy.orm import Session
@@ -47,13 +47,26 @@ async def endpoint_get_user_detail(
 
 
 @private_router.get("/get-list")
-async def endpoint_get_users_list():
-    pass
+async def endpoint_get_users_list(
+        db: Session = Depends(get_db)
+):
+    try:
+        response = await users_list(db)
+        return response
+    except Exception as e:
+        return e
 
 
-@private_router.post("/delete")
-async def endpoint_delete_user():
-    pass
+@private_router.post("/delete/{user_id}")
+async def endpoint_delete_user(
+        user_id: int,
+        db: Session = Depends(get_db)
+):
+    try:
+        response = await delete_user(user_id,db)
+        return response
+    except Exception as e:
+        return e
 
 
 @private_router.post("/update-detail/{user_id}")
