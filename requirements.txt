@@ -5,7 +5,13 @@ pymysql==1.1.0
 python-jose==3.3.0
 passlib==1.7.4
 pydantic~=2.6.3
+pydantic_settings~=2.2.1
+email-validator~=2.1.1
 jose~=1.0.0
 python-dotenv~=1.0.1
 fastapi_auth_middleware~=1.0.2
 starlette~=0.36.3
+python-multipart~=0.0.9
+redis~=5.0.3
+motor~=3.3.2
+pytest~=8.1.1

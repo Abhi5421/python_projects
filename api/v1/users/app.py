@@ -4,7 +4,9 @@ from api.v1.users.schema import NewUser, UpdateUserModel
 from sqlalchemy.orm import Session
 from database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm
+from utils.logger import create_logger
 
+logging = create_logger(__name__)
 public_router = APIRouter()
 private_router = APIRouter()
 
@@ -18,6 +20,7 @@ async def endpoint_sign_up(
         response = await sign_up(data, db)
         return response
     except Exception as e:
+        logging.error(e)
         return e
 
 
@@ -31,6 +34,7 @@ async def endpoint_login(
         response = await log_in(form_data, db)
         return response
     except Exception as e:
+        logging.error(e)
         return e
 
 
@@ -43,6 +47,7 @@ async def endpoint_get_user_detail(
         response = await user_detail(user_id, db)
         return response
     except Exception as e:
+        logging.error(e)
         return e
 
 
@@ -54,6 +59,7 @@ async def endpoint_get_users_list(
         response = await users_list(db)
         return response
     except Exception as e:
+        logging.error(e)
         return e
 
 
@@ -66,6 +72,7 @@ async def endpoint_delete_user(
         response = await delete_user(user_id,db)
         return response
     except Exception as e:
+        logging.error(e)
         return e
 
 
@@ -79,5 +86,5 @@ async def endpoint_update_user_detail(
         response = await update_user(user_id, data, db)
         return response
     except Exception as e:
-        print(e)
+        logging.error(e)
         return e

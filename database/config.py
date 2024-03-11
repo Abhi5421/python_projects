@@ -7,6 +7,8 @@ load_dotenv(verbose=True)
 class Setting(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     mysql_url: str
+    mongo_url: str
+    redis_url: str
 
 
 class JWT(BaseSettings):

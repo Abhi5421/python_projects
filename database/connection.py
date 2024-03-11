@@ -1,9 +1,19 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+import motor.motor_asyncio
+import redis
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database.config import settings
 
+# mysql
 DATABASE_URL = settings.mysql_url
+
+# mongoDB
+client = motor.motor_asyncio.AsyncIOMotorClient(settings.mongo_url)
+db_name = client['fast_api_mongo_db']
+
+# redis
+redis_db = redis.from_url(settings.redis_url)
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

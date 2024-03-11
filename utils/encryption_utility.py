@@ -3,11 +3,9 @@ from jose import jwt
 from database.config import jwt_settings
 from passlib.context import CryptContext
 from fastapi import Request
-from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
 from starlette.authentication import AuthenticationError
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 crypt_context = CryptContext(schemes=["bcrypt"], bcrypt__default_rounds=5, deprecated="auto")
 
 
