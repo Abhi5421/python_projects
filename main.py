@@ -4,7 +4,6 @@ from api.v1.users.app import public_router
 from api.v1.users.app import private_router
 from api.v1.users import model
 from database.connection import engine
-from fastapi.security import OAuth2PasswordBearer
 import time
 from fastapi_auth_middleware import AuthMiddleware
 from utils.encryption_utility import handle_auth_error
@@ -12,8 +11,6 @@ from api.v1.users.utility import get_authorised_user
 from utils.logger import create_logger
 
 logging = create_logger(__name__)
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 model.Base.metadata.create_all(bind=engine)
 

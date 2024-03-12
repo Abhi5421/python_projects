@@ -1,0 +1,59 @@
+version: "3.3"
+
+services:
+  fastapi_service:
+    build:
+      context: .
+    volumes:
+      - ./:/app/
+      - type: bind
+        source: /home/fastapi_service_logs/
+        target: /home/fastapi_service_logs/
+    networks:
+      - deploy_fastapi_service_network
+    ports:
+      - 8005:8005
+  fastapi_mysql_db_service:
+    image: mysql:latest
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d
+    networks:
+      - deploy_fastapi_service_network
+    ports:
+      - 3306:3306
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-""}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-""}
+      - MYSQL_ROOT_HOST=%
+  fastapi_mongodb_service:
+    image: mongo:latest
+    container_name: fastapi_mongodb_service
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=""
+      - MONGO_INITDB_ROOT_PASSWORD=""
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - deploy_fastapi_service_network
+    ports:
+      - 27018:27018
+  fastapi_redis_service:
+    image: redis:latest
+    networks:
+      - deploy_fastapi_service_network
+    ports:
+      - 6381:6381
+    expose:
+      - 6381
+    volumes:
+      - fastapi_redis_data:/data
+networks:
+  deploy_fastapi_service_network:
+    driver: bridge
+volumes:
+  mongodb-data:
+    external: false
+  fastapi_redis_data:
+    external: false
+
