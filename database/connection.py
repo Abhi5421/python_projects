@@ -1,8 +1,7 @@
 from sqlalchemy import create_engine
 import motor.motor_asyncio
 import redis
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base,sessionmaker
 from database.config import settings
 
 # mysql

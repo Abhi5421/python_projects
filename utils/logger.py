@@ -8,9 +8,9 @@ MAX_LOG_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 BACKUP_COUNT = 5
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 LOG_DIR = "logs/"
-if not os.path.exists(LOG_DIR):
-    os.mkdir(LOG_DIR)
 FILE_NAME = "{}/{}.log".format(LOG_DIR, datetime.now().strftime("%Y-%b-%d"))
+if not os.path.exists(FILE_NAME):
+    os.mkdir(FILE_NAME)
 
 
 def get_console_handler():

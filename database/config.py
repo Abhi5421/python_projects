@@ -9,6 +9,7 @@ class Setting(BaseSettings):
     mysql_url: str
     mongo_url: str
     redis_url: str
+    rabbitmq_creds: dict
 
 
 class JWT(BaseSettings):
