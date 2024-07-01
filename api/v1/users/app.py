@@ -1,10 +1,13 @@
-from fastapi import APIRouter,Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from api.v1.users.utility import *
 from api.v1.users.schema import NewUser, UpdateUserModel
 from sqlalchemy.orm import Session
 from database.connection import get_db
 from fastapi.security import OAuth2PasswordRequestForm
 from utils.logger import create_logger
+import os
+from utils.celery_task import celery, process_image
+from celery.result import AsyncResult
 
 logging = create_logger(__name__)
 public_router = APIRouter()
@@ -69,7 +72,7 @@ async def endpoint_delete_user(
         db: Session = Depends(get_db)
 ):
     try:
-        response = await delete_user(user_id,db)
+        response = await delete_user(user_id, db)
         return response
     except Exception as e:
         logging.error(e)
@@ -88,3 +91,31 @@ async def endpoint_update_user_detail(
     except Exception as e:
         logging.error(e)
         return e
+
+
+# celery endpoints
+
+@public_router.post('/upload/')
+async def upload_image(
+        file: UploadFile = File(...)
+):
+    file_path = os.path.join('static/uploads', file.filename)
+    with open(file_path, 'wb') as f:
+        f.write(await file.read())
+
+    # Trigger Celery task for image processing
+    task = process_image.delay(file_path, 'static/processed')
+
+    return {'task_id': task.id, 'message': 'Image processing started'}
+
+
+@public_router.get('/task-status/{task_id}')
+async def task_status(task_id: str):
+    result = AsyncResult(task_id, app=celery)
+    if result.ready():
+        if result.successful():
+            return {'status': 'COMPLETED', 'result': result.get()}
+        else:
+            return {'status': 'FAILED', 'message': str(result.result)}
+    else:
+        return {'status': 'PENDING'}
