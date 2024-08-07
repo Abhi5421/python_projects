@@ -2,8 +2,7 @@ from fastapi import FastAPI, Request
 import uvicorn
 from api.v1.users.app import public_router
 from api.v1.users.app import private_router
-from api.v1.users import model
-from database.connection import engine
+from database.connection import engine,Base
 import time
 from fastapi_auth_middleware import AuthMiddleware
 from utils.encryption_utility import handle_auth_error
@@ -11,8 +10,7 @@ from api.v1.users.utility import get_authorised_user
 from utils.logger import create_logger
 
 logging = create_logger(__name__)
-
-model.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 public_app = FastAPI(docs_url="/api/docs")
 public_app.include_router(public_router, prefix="/user", tags=['users'])

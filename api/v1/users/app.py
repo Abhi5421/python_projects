@@ -8,6 +8,7 @@ from utils.logger import create_logger
 import os
 from utils.celery_task import celery, process_image
 from celery.result import AsyncResult
+from utils.custom_error_handling import CustomError
 
 logging = create_logger(__name__)
 public_router = APIRouter()
@@ -22,9 +23,12 @@ async def endpoint_sign_up(
     try:
         response = await sign_up(data, db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @public_router.post("/sign-in")
@@ -36,9 +40,12 @@ async def endpoint_login(
     try:
         response = await log_in(form_data, db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @private_router.get("/get-detail/{user_id}")
@@ -49,9 +56,12 @@ async def endpoint_get_user_detail(
     try:
         response = await user_detail(user_id, db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @private_router.get("/get-list")
@@ -61,9 +71,12 @@ async def endpoint_get_users_list(
     try:
         response = await users_list(db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @private_router.post("/delete/{user_id}")
@@ -74,9 +87,12 @@ async def endpoint_delete_user(
     try:
         response = await delete_user(user_id, db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @private_router.post("/update-detail/{user_id}")
@@ -88,9 +104,12 @@ async def endpoint_update_user_detail(
     try:
         response = await update_user(user_id, data, db)
         return response
+    except CustomError as e:
+        return JSONResponse(content={'status': False, 'detail': e.detail, 'status_code': e.status_code})
     except Exception as e:
         logging.error(e)
-        return e
+        return JSONResponse(content={'status': False, 'status_code': 500, 'detail': str(e)},
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # celery endpoints

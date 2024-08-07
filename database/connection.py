@@ -23,6 +23,7 @@ Base = declarative_base()
 def get_db():
     db = None
     try:
+        print("main session")
         db = SessionLocal()
         yield db
     finally:

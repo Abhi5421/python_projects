@@ -9,15 +9,21 @@ from fastapi.security import OAuth2PasswordBearer
 from database.config import jwt_settings
 from database.connection import SessionLocal
 from jose import jwt, JWTError
-
+from utils.custom_error_handling import CustomError
 
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# credentials_exception = HTTPException(
+#     status_code=status.HTTP_401_UNAUTHORIZED,
+#     detail="Could not validate credentials",
+#     headers={"WWW-Authenticate": "Bearer"},
+# )
 
 
 async def sign_up(data: NewUser, db: Session):
     exists, user = check_if_user_exists(data.email, db)
     if exists:
-        return HTTPException(status_code=500, detail="user already exists, try login")
+        # return HTTPException(status_code=500,detail="")
+        raise CustomError(error="user exists",statuscode=500)
     result = User(email=data.email,
                   password=get_password_hash(data.password))
     db.add(result)
@@ -31,7 +37,7 @@ async def get_authorised_user(token: str):
         payload = jwt.decode(token, jwt_settings.jwt_secret_key, algorithms=[jwt_settings.jwt_algorithm])
         email: str = payload.get("sub")
         if email is None:
-            return False
+            raise CustomError(error="Unauthenticated",statuscode=500)
     except JWTError:
         return False
     db = SessionLocal()
@@ -102,4 +108,4 @@ async def users_list(db: Session):
 async def delete_user(user_id: int, db: Session):
     response = db.query(User).delete(User.user_id == user_id)
     if response:
-        return {"message":"User deleted"}
+        return {"message": "User deleted"}
