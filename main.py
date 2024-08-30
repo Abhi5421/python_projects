@@ -8,6 +8,10 @@ from fastapi_auth_middleware import AuthMiddleware
 from utils.encryption_utility import handle_auth_error
 from api.v1.users.utility import get_authorised_user
 from utils.logger import create_logger
+import os
+
+if not os.path.exists("logs/"):
+    os.mkdir("logs/")
 
 logging = create_logger(__name__)
 Base.metadata.create_all(bind=engine)
