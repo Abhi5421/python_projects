@@ -2,13 +2,14 @@ import logging
 import os
 import sys
 from datetime import datetime
-from logging.handlers import RotatingFileHandler,WatchedFileHandler
+from logging.handlers import RotatingFileHandler, WatchedFileHandler
 
 MAX_LOG_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 BACKUP_COUNT = 5
 FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
 LOG_DIR = "logs/"
 FILE_NAME = "{}/{}.log".format(LOG_DIR, datetime.now().strftime("%Y-%b-%d"))
+os.makedirs(LOG_DIR, exist_ok=True)
 
 
 def get_console_handler():
